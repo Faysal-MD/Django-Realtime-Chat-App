@@ -8,19 +8,27 @@
             margin: 0 auto;
             max-width: 800px;
             padding: 0 20px;
+            font-family: Arial, sans-serif;
+            background: #f4f4f9;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
         }
 
         .container {
             border: 2px solid #dedede;
-            background-color: #f1f1f1;
+            background-color: #fff;
             border-radius: 5px;
             padding: 10px;
             margin: 10px 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         .darker {
             border-color: #ccc;
-            background-color: #ddd;
+            background-color: #f9f9f9;
         }
 
         .container::after {
@@ -52,6 +60,38 @@
             float: left;
             color: #999;
         }
+
+        .message-input {
+            margin: 20px 0;
+        }
+
+        .message-input input[type=text],
+        .message-input select {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        .message-input input[type=submit] {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .message-input input[type=submit]:hover {
+            background-color: #45a049;
+        }
     </style>
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"
         integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
@@ -59,24 +99,18 @@
 
 <body>
 
-    <h2>{{room}} - DjChat</h2>
+    <h2>{{ room }} - DjChat</h2>
 
     <div id="display">
-
-        <!-- <div class="container darker">
-  <b>Tom</b><p>Hello Everyone, How Are You Guys Doing?</p>
-  <span class="time-left">20th, April 2021</span>
-</div> -->
-
+        <!-- Messages will be displayed here -->
     </div>
 
     <script>
         $(document).ready(function () {
-
             setInterval(function () {
                 $.ajax({
                     type: 'GET',
-                    url: "/getMessages/{{room}}/",
+                    url: "/getMessages/{{ room }}/",
                     success: function (response) {
                         console.log(response);
                         $("#display").empty();
@@ -86,58 +120,22 @@
                         }
                     },
                     error: function (response) {
-                        alert('An error occured')
+                        alert('An error occurred');
                     }
                 });
             }, 1000);
-        })
+        });
     </script>
 
-
-    <div class="container">
-        <style>
-            input[type=text],
-            select {
-                width: 100%;
-                padding: 12px 20px;
-                margin: 8px 0;
-                display: inline-block;
-                border: 1px solid #ccc;
-                border-radius: 4px;
-                box-sizing: border-box;
-            }
-
-            input[type=submit] {
-                width: 100%;
-                background-color: #4CAF50;
-                color: white;
-                padding: 14px 20px;
-                margin: 8px 0;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-            }
-
-            input[type=submit]:hover {
-                background-color: #45a049;
-            }
-
-            div {
-                border-radius: 5px;
-                background-color: #f2f2f2;
-                padding: 20px;
-            }
-        </style>
-
+    <div class="message-input">
         <form id="post-form">
             {% csrf_token %}
-            <input type="hidden" name="username" id="username" value="{{username}}" />
-            <input type="hidden" name="room_id" id="room_id" value="{{room_details.id}}" />
-            <input type="text" name="message" id="message" width="100px" />
+            <input type="hidden" name="username" id="username" value="{{ username }}" />
+            <input type="hidden" name="room_id" id="room_id" value="{{ room_details.id }}" />
+            <input type="text" name="message" id="message" placeholder="Type your message here..." />
             <input type="submit" value="Send">
         </form>
     </div>
-
 
 </body>
 
@@ -155,10 +153,11 @@
                 csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
             },
             success: function (data) {
-                // alert(data)
+                // Update display after sending the message
+                $("#display").append("<div class='container darker'><b>" + $('#username').val() + "</b><p>" + $('#message').val() + "</p><span class='time-left'>Just now</span></div>");
+                document.getElementById('message').value = '';
             }
         });
-        document.getElementById('message').value = ''
     });
 </script>
 
